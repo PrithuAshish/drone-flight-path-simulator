@@ -190,3 +190,7 @@ Institution: **VIT University – Vellore**
 - Hart, Nilsson, Raphael — *A Formal Basis for the Heuristic Determination of Minimum Cost Paths*  
 - Python Pathfinding Tutorials  
 - Drone Navigation Research Papers (IEEE)
+
+## Simulation Output
+
+![Drone Flight Path](flight_path.png)
