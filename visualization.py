@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 def show_grid(grid, path=None, start=None, goal=None):
@@ -18,4 +20,6 @@ def show_grid(grid, path=None, start=None, goal=None):
         plt.scatter(goal[0], goal[1])
 
     plt.title("Drone Flight Path Simulator")
-    plt.show()
+    plt.savefig("flight_path.png")
+    plt.close()
+    print("Flight path saved to flight_path.png")
