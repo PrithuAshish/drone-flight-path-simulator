@@ -1,7 +1,11 @@
 import heapq
+import math
+
 
 def heuristic(a, b):
-    return abs(a[0]-b[0]) + abs(a[1]-b[1])
+    # Euclidean distance (better for diagonal movement)
+    return math.hypot(a[0] - b[0], a[1] - b[1])
+
 
 def astar(grid, start, goal):
 
@@ -12,11 +16,18 @@ def astar(grid, start, goal):
     heapq.heappush(open_set, (0, start))
 
     came_from = {}
-    g_score = {start:0}
+    g_score = {start: 0}
+
+    visited = set()
 
     while open_set:
 
         current = heapq.heappop(open_set)[1]
+
+        if current in visited:
+            continue
+
+        visited.add(current)
 
         if current == goal:
 
@@ -31,26 +42,36 @@ def astar(grid, start, goal):
 
             return path
 
-        x,y = current
+        x, y = current
 
-        neighbors = [(x+1,y),(x-1,y),(x,y+1),(x,y-1)]
+        neighbors = [
+            (x+1, y), (x-1, y), (x, y+1), (x, y-1),        # straight
+            (x+1, y+1), (x-1, y-1), (x+1, y-1), (x-1, y+1) # diagonal
+        ]
 
-        for nx,ny in neighbors:
+        for nx, ny in neighbors:
 
             if 0 <= nx < cols and 0 <= ny < rows:
 
                 if grid[ny][nx] == 1:
                     continue
 
-                tentative = g_score[current] + 1
+                # --- Prevent Corner Cutting ---
+                if nx != x and ny != y:
+                    if grid[y][nx] == 1 or grid[ny][x] == 1:
+                        continue
+                    move_cost = math.sqrt(2)
+                else:
+                    move_cost = 1
 
-                if (nx,ny) not in g_score or tentative < g_score[(nx,ny)]:
+                tentative = g_score[current] + move_cost
 
-                    g_score[(nx,ny)] = tentative
-                    f = tentative + heuristic((nx,ny),goal)
+                if (nx, ny) not in g_score or tentative < g_score[(nx, ny)]:
 
-                    heapq.heappush(open_set,(f,(nx,ny)))
+                    g_score[(nx, ny)] = tentative
+                    f = tentative + heuristic((nx, ny), goal)
 
-                    came_from[(nx,ny)] = current
+                    heapq.heappush(open_set, (f, (nx, ny)))
+                    came_from[(nx, ny)] = current
 
     return None
