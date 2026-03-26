@@ -30,9 +30,19 @@ time_dijkstra = time.time() - start_time
 print("\n" + "-"*50)
 print("ALGORITHM COMPARISON")
 print("-"*50)
-print(f"A* Path Length: {len(path_astar)} steps | Execution Time: {time_astar*1000:.2f}ms")
-print(f"Dijkstra Path Length: {len(path_dijkstra)} steps | Execution Time: {time_dijkstra*1000:.2f}ms")
-print(f"A* is {(time_dijkstra/time_astar - 1)*100:.1f}% faster\n")
+
+if path_astar:
+    print(f"A* Path Length: {len(path_astar)} steps | Execution Time: {time_astar*1000:.2f}ms")
+else:
+    print("A* could not find a path")
+
+if path_dijkstra:
+    print(f"Dijkstra Path Length: {len(path_dijkstra)} steps | Execution Time: {time_dijkstra*1000:.2f}ms")
+else:
+    print("Dijkstra could not find a path")
+
+if path_astar and path_dijkstra:
+    print(f"A* is {(time_dijkstra/time_astar - 1)*100:.1f}% faster\n")
 
 distance, time_taken, battery = compute_metrics(path_astar)
 
@@ -44,11 +54,19 @@ print(f"Time Estimate: {time_taken:.1f} seconds")
 print(f"Battery Usage: {battery:.1f}%\n")
 
 print("Simulating realistic drone movement...")
-simulate_drone_realistic(path_astar)
+if path_astar:
+    simulate_drone_realistic(path_astar)
+else:
+    print("Skipping drone simulation — no path found")
 
 print("\nGenerating visualizations...")
-show_grid(env.grid, path_astar, start, goal, algorithm="A*")
-animate_paths(env.grid, path_astar, path_dijkstra, start, goal)
+if path_astar:
+    show_grid(env.grid, path_astar, start, goal, algorithm="A*")
+
+if path_astar and path_dijkstra:
+    animate_paths(env.grid, path_astar, path_dijkstra, start, goal)
+else:
+    print("Skipping comparison visualization — one or more paths missing")
 
 print("\n" + "="*50)
 print("SIMULATION COMPLETE")
