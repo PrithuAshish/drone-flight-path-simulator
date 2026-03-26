@@ -23,7 +23,8 @@ def show_grid(grid, path=None, start=None, goal=None, algorithm="A*"):
     ax.legend(loc="upper right")
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
-    filename = f"flight_path_{algorithm.lower()}.png"
+    safe_algo = algorithm.lower().replace("*", "star")
+    filename = f"flight_path_{safe_algo}.png"
     plt.savefig(filename, dpi=100)
     plt.close()
     print(f"Path visualization saved to {filename}")
