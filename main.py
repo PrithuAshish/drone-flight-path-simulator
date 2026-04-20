@@ -2,72 +2,93 @@ import time
 from grid import GridEnvironment
 from astar import astar
 from dijkstra import dijkstra
+from mea_star import mea_star
 from visualization import show_grid, animate_paths
 from simulator import simulate_drone_realistic
 from utils import compute_metrics
 
-env = GridEnvironment(20, 20)
-env.generate_random_obstacles(40)
 
-start = (0, 0)
-goal = (18, 18)
+# High precision timer
+def get_time():
+    return time.perf_counter()
 
-print("\n" + "="*50)
-print("DRONE FLIGHT PATH SIMULATOR")
-print("="*50)
-print(f"Grid: {env.width}x{env.height} | Obstacles: 40 | Start: {start} | Goal: {goal}\n")
 
-print("Running A* Algorithm...")
-start_time = time.time()
-path_astar = astar(env.grid, start, goal)
-time_astar = time.time() - start_time
+def run_simulation(obstacle_count, run_drone_sim=True):
 
-print("Running Dijkstra Algorithm...")
-start_time = time.time()
-path_dijkstra = dijkstra(env.grid, start, goal)
-time_dijkstra = time.time() - start_time
+    env = GridEnvironment(20, 20)
+    env.generate_random_obstacles(obstacle_count)
 
-print("\n" + "-"*50)
-print("ALGORITHM COMPARISON")
-print("-"*50)
+    start = (0, 0)
+    goal = (18, 18)
 
-if path_astar:
-    print(f"A* Path Length: {len(path_astar)} steps | Execution Time: {time_astar*1000:.2f}ms")
-else:
-    print("A* could not find a path")
+    print("\n" + "="*60)
+    print(f"DRONE FLIGHT PATH SIMULATION | Obstacles = {obstacle_count}")
+    print("="*60)
 
-if path_dijkstra:
-    print(f"Dijkstra Path Length: {len(path_dijkstra)} steps | Execution Time: {time_dijkstra*1000:.2f}ms")
-else:
-    print("Dijkstra could not find a path")
+    # ---------- A* ----------
+    print("Running A* Algorithm...")
+    t0 = get_time()
+    path_astar = astar(env.grid, start, goal)
+    time_astar = get_time() - t0
 
-if path_astar and path_dijkstra:
-    print(f"A* is {(time_dijkstra/time_astar - 1)*100:.1f}% faster\n")
+    # ---------- Dijkstra ----------
+    print("Running Dijkstra Algorithm...")
+    t0 = get_time()
+    path_dijkstra = dijkstra(env.grid, start, goal)
+    time_dijkstra = get_time() - t0
 
-distance, time_taken, battery = compute_metrics(path_astar)
+    # ---------- MEA* ----------
+    print("Running MEA* Algorithm...")
+    t0 = get_time()
+    path_mea = mea_star(env.grid, start, goal)
+    time_mea = get_time() - t0
 
-print("-"*50)
-print("PATH METRICS (A* Algorithm)")
-print("-"*50)
-print(f"Distance: {distance} units")
-print(f"Time Estimate: {time_taken:.1f} seconds")
-print(f"Battery Usage: {battery:.1f}%\n")
+    print("\n--- Algorithm Comparison ---")
 
-print("Simulating realistic drone movement...")
-if path_astar:
-    simulate_drone_realistic(path_astar)
-else:
-    print("Skipping drone simulation — no path found")
+    if path_astar:
+        print(f"A*       → Steps: {len(path_astar):3d} | Time: {time_astar*1000:.4f} ms")
+    else:
+        print("A*       → No Path Found")
 
-print("\nGenerating visualizations...")
-if path_astar:
-    show_grid(env.grid, path_astar, start, goal, algorithm="A*")
+    if path_dijkstra:
+        print(f"Dijkstra → Steps: {len(path_dijkstra):3d} | Time: {time_dijkstra*1000:.4f} ms")
+    else:
+        print("Dijkstra → No Path Found")
 
-if path_astar and path_dijkstra:
-    animate_paths(env.grid, path_astar, path_dijkstra, start, goal)
-else:
-    print("Skipping comparison visualization — one or more paths missing")
+    if path_mea:
+        print(f"MEA*     → Steps: {len(path_mea):3d} | Time: {time_mea*1000:.4f} ms")
+    else:
+        print("MEA*     → No Path Found")
 
-print("\n" + "="*50)
-print("SIMULATION COMPLETE")
-print("="*50)
+    # ---------- Metrics ----------
+    if path_astar:
+        distance, time_taken, battery = compute_metrics(path_astar)
+
+        print("\n--- Path Metrics (A*) ---")
+        print(f"Distance      : {distance}")
+        print(f"Est Time      : {time_taken:.2f}s")
+        print(f"Battery Usage : {battery:.2f}%")
+
+        if run_drone_sim:
+            print("\nSimulating Drone Movement...")
+            simulate_drone_realistic(path_astar)
+
+    # ---------- Visualization ----------
+    print("\nGenerating Visualizations...")
+
+    if path_astar:
+        show_grid(env.grid, path_astar, start, goal,
+                  algorithm=f"A*_obs{obstacle_count}")
+
+    if path_mea:
+        show_grid(env.grid, path_mea, start, goal,
+                  algorithm=f"MEA*_obs{obstacle_count}")
+
+    if path_astar and path_dijkstra:
+        animate_paths(env.grid, path_astar, path_dijkstra, start, goal)
+
+    print("\nSimulation Complete\n")
+
+
+if __name__ == "__main__":
+    run_simulation(40)
