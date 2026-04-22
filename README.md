@@ -1,196 +1,176 @@
-# Drone Flight Path Simulator
+# 🚁 Drone Flight Path Simulator
 
-A Python-based drone navigation simulator that computes and visualizes optimal flight paths in a grid environment with obstacles.  
-The simulator implements classical path planning algorithms such as **A\*** and **Dijkstra** to determine efficient routes between two points.
-
-This project demonstrates how autonomous drones can safely navigate complex environments before real-world deployment.
+A grid-based drone path planning simulator that compares **Dijkstra’s Algorithm**, **A***, and **Memory-Efficient A*** (MEA*) under realistic movement and energy constraints.
 
 ---
 
-# Project Overview
+## 📌 Overview
 
-Drones are widely used in industries such as logistics, surveillance, agriculture, and disaster response.  
-However, testing navigation algorithms on real drones is expensive and potentially dangerous.
+This project simulates autonomous drone navigation in a 2D grid environment with randomly generated obstacles. It evaluates the performance of classical pathfinding algorithms using:
 
-This simulator provides a safe virtual environment to experiment with and evaluate drone path planning algorithms.
+* 8-directional movement (including diagonals)
+* Weighted traversal costs
+* Realistic drone metrics (time, battery usage)
 
-The system:
-
-- Generates a grid-based environment
-- Places obstacles in the environment
-- Computes the optimal route between start and destination points
-- Simulates drone movement along the calculated path
-- Visualizes the route and environment
+The simulator generates both **visual outputs** and **performance comparisons** across different obstacle densities.
 
 ---
 
-# Features
+## ⚙️ Features
 
-- Grid-based environment simulation
-- Obstacle generation
-- Path planning using **A\*** algorithm
-- Path planning using **Dijkstra algorithm**
-- Drone movement simulation
-- Visualization of flight path
-- Performance metrics (distance, time, battery usage)
+* 🧠 Implements:
 
----
+  * Dijkstra’s Algorithm
+  * A* Algorithm (with Euclidean heuristic)
+  * Memory-Efficient A* (MEA*)
 
-# Algorithms Implemented
+* 🧭 Realistic Navigation:
 
-## A* Algorithm
+  * 8-directional movement
+  * Diagonal cost = √2
+  * Corner-cutting prevention
 
-A heuristic-based pathfinding algorithm that efficiently finds the shortest path by combining:
+* 📊 Performance Metrics:
 
-- Actual cost from start
-- Estimated cost to goal
+  * Distance traveled
+  * Traversal time (drone)
+  * Battery consumption
+  * Execution time (algorithm)
 
-It is widely used in robotics, games, and autonomous navigation.
+* 📈 Visualization:
 
-## Dijkstra Algorithm
-
-A classical shortest path algorithm that guarantees the optimal path in weighted graphs but does not use heuristics.
-
-This project compares its results with A*.
+  * Path plots for each algorithm
+  * Comparison image (A* vs Dijkstra vs MEA*)
+  * Terminal output logs
 
 ---
 
-# Project Structure
-drone-flight-path-simulator
-│
-├── main.py # Entry point of the simulator
-├── grid.py # Grid environment and obstacle generation
-├── astar.py # A* pathfinding algorithm
-├── dijkstra.py # Dijkstra pathfinding algorithm
-├── simulator.py # Drone movement simulation
-├── visualization.py # Path and grid visualization
-├── utils.py # Helper functions and metrics
-│
-├── requirements.txt # Required Python libraries
-├── README.md # Project documentation
-│
-└── test_cases
-└── scenarios.md # Simulation testing scenarios
+## 🗂️ Project Structure
 
+```
+.
+├── main.py                  # Runs single simulation
+├── experiment_runner.py     # Runs multiple test cases
+├── astar.py                 # A* implementation
+├── dijkstra.py              # Dijkstra implementation
+├── mea_star.py              # Memory-efficient A*
+├── grid.py                  # Environment + obstacles
+├── visualization.py         # Plotting + comparison
+├── simulator.py             # Drone movement simulation
+├── utils.py                 # Metrics computation
+├── requirements.txt
+└── README.md
+```
 
 ---
 
-# Installation
+## ▶️ How to Run
 
-Clone the repository:
-git clone https://github.com/your-username/drone-flight-path-simulator.git
+### 1. Install dependencies
 
-cd drone-flight-path-simulator
-
-Install dependencies:
+```
 pip install -r requirements.txt
+```
 
+### 2. Run a single simulation
 
----
-
-# Running the Simulator
-
-Run the main program:
+```
 python main.py
+```
 
+### 3. Run experiments (0, 20, 40 obstacles)
 
-The simulator will:
-
-1. Generate a grid environment
-2. Add random obstacles
-3. Compute optimal paths using A* and Dijkstra
-4. Simulate drone movement
-5. Visualize the flight path
+```
+python experiment_runner.py
+```
 
 ---
 
-# Example Output
+## 📊 Sample Output
 
-Console output:
+### Algorithm Comparison (Execution Time)
 
+```
+A*       → Steps: 24 | Exec Time: 1.49 ms
+Dijkstra → Steps: 24 | Exec Time: 1.95 ms
+MEA*     → Steps: 24 | Exec Time: 0.87 ms
+```
 
-Running A*
-Running Dijkstra
+### Drone Metrics (Traversal)
 
-A* path length: 28
-Dijkstra path length: 28
-
-Distance: 28
-Time: 14
-Battery: 5.6
-
-Drone moving to: (0,0)
-Drone moving to: (1,0)
-Drone moving to: (2,0)
-...
-
-
-A visualization window will display:
-
-- Obstacles
-- Start point
-- Destination
-- Calculated path
+```
+Distance      : 28.38
+Traversal Time: 14.19s
+Battery Usage : 8.52%
+```
 
 ---
 
-# Applications
+## 🖼️ Visual Outputs
 
-This project has applications in multiple domains:
+* Path visualizations for:
 
-- Drone delivery systems
-- Autonomous robotics navigation
-- Disaster response planning
-- Smart city aerial mapping
-- Military surveillance route planning
+  * A*
+  * Dijkstra
+  * MEA*
 
----
+* Generated for obstacle densities:
 
-# Future Improvements
+  * 0
+  * 20
+  * 40
 
-Possible extensions include:
+* Comparison plot:
 
-- 3D drone flight simulation
-- Wind and environmental effects
-- Multi-drone coordination
-- Machine learning based route optimization
-- Real drone hardware integration
-- Interactive GUI dashboard
+```
+algorithm_comparison.png
+```
 
 ---
 
-# Technologies Used
+## 🧠 Key Insights
 
-- Python
-- NumPy
-- Matplotlib
+* All algorithms produce **optimal paths (same distance)**
+* Differences arise in:
 
-Algorithms:
-
-- A*
-- Dijkstra
-
----
-
-# Team Members
-
-- Lakshmi A  
-- Prithu Ashish  
-- Dhana Sridhar Gopalakrishnan  
-- Pradeep C  
-- Ansh Gupta  
-
-Mentor: **Prof. Reya Sharma**  
-Institution: **VIT University – Vellore**
+  * Execution time
+  * Search efficiency
+* A* is fastest due to heuristic guidance
+* Dijkstra explores more nodes → slower
+* MEA* balances memory and performance
 
 ---
 
-# References
+## 📚 Applications
 
-- Hart, Nilsson, Raphael — *A Formal Basis for the Heuristic Determination of Minimum Cost Paths*  
-- Python Pathfinding Tutorials  
-- Drone Navigation Research Papers (IEEE)
+* Autonomous drone navigation
+* Robotics path planning
+* AI search algorithm comparison
+* Simulation-based optimization
 
-## Simulation Output
+---
 
-![Drone Flight Path](flight_path.png)
+## 🔮 Future Improvements
+
+* Dynamic obstacle handling
+* Real-time path replanning
+* 3D navigation
+* Path smoothing techniques
+* Integration with reinforcement learning
+
+---
+
+## 👨‍💻 Authors
+
+* Prithu Ashish
+* Pradeep C
+* Lakshmi Anand
+* Ansh Gupta
+
+VIT University, Vellore
+
+---
+
+## 📄 License
+
+This project is for academic and educational use.
