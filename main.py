@@ -61,31 +61,39 @@ def run_simulation(obstacle_count, run_drone_sim=True):
         print("MEA*     → No Path Found")
 
     # ---------- Metrics ----------
+    print("\n--- Drone Model Parameters ---")
+    print("Speed          : 2.0 units/sec")
+    print("Battery Usage  : 0.3 % per unit distance")
+    print("Movement Model : 8-directional (diagonal allowed)")
+    print("\n--- Path Traversal Metrics ---")
+
     if path_astar:
-        distance, time_taken, battery = compute_metrics(path_astar)
+        d,t,b = compute_metrics(path_astar)
+        print(f"A*       → Steps: {len(path_astar):3d} | Exec Time: {time_astar*1000:.4f} ms")
+    if path_dijkstra:
+        d,t,b = compute_metrics(path_dijkstra)
+        print(f"Dijkstra → Steps: {len(path_dijkstra):3d} | Exec Time: {time_dijkstra*1000:.4f} ms")
 
-        print("\n--- Path Metrics (A*) ---")
-        print(f"Distance      : {distance}")
-        print(f"Est Time      : {time_taken:.2f}s")
-        print(f"Battery Usage : {battery:.2f}%")
-
-        if run_drone_sim:
-            print("\nSimulating Drone Movement...")
-            simulate_drone_realistic(path_astar)
-
+    if path_mea:
+        d,t,b = compute_metrics(path_mea)
+        print(f"MEA*     → Steps: {len(path_mea):3d} | Exec Time: {time_mea*1000:.4f} ms")
     # ---------- Visualization ----------
     print("\nGenerating Visualizations...")
 
     if path_astar:
         show_grid(env.grid, path_astar, start, goal,
                   algorithm=f"A*_obs{obstacle_count}")
+    
+    if path_dijkstra:
+        show_grid(env.grid, path_dijkstra, start, goal,
+                  algorithm=f"Dijkstra_obs{obstacle_count}")
 
     if path_mea:
         show_grid(env.grid, path_mea, start, goal,
                   algorithm=f"MEA*_obs{obstacle_count}")
 
-    if path_astar and path_dijkstra:
-        animate_paths(env.grid, path_astar, path_dijkstra, start, goal)
+    if path_astar and path_dijkstra and path_mea:
+        animate_paths(env.grid, path_astar, path_dijkstra, path_mea, start, goal)
 
     print("\nSimulation Complete\n")
 
